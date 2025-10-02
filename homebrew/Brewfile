@@ -1,0 +1,74 @@
+# Brewfile generated from nix-darwin homebrew config
+
+# --- brews ---
+brew "djview4"
+brew "mas"
+brew "ollama"
+
+# --- casks ---
+cask "orbstack"
+cask "mactex-no-gui"
+cask "adguard"
+cask "keyclu"
+cask "markedit"
+# cask "baidunetdisk"   # 有 mas 版
+cask "claude"
+# cask "tencent-meeting"  # 有 mas 版
+# cask "devonthink"
+cask "jordanbaird-ice"
+cask "keyboard-maestro"
+cask "nutstore"
+cask "pearcleaner"
+cask "trae"
+cask "calibre"
+# cask "siyuan"
+cask "anki"
+cask "reader"
+cask "claude-code"
+cask "chatgpt"
+# cask "cherry-studio"
+cask "skim"
+cask "mos"
+cask "launchbar"
+cask "bruno"
+cask "localsend"
+# cask "telegram"
+cask "google-chrome"
+cask "datagrip"
+cask "ghostty"
+cask "obsidian"
+cask "visual-studio-code"
+cask "wechat"
+cask "zotero@beta"
+cask "firefox"
+
+# --- Mac App Store (mas) ---
+mas "Flow - Focus & Pomodoro Timer", id: 1423210932
+# mas "财新", id: 356023612          # mas 不支持安装 ios/ipad 版
+# mas "三联中读-让阅读更高品质", id: 509436231
+# mas "微信读书", id: 952059546
+mas "知犀思维导图", id: 1564236678
+mas "Bitwarden", id: 1352778147
+mas "Command X", id: 6448461551
+mas "CotEditor", id: 1024640650
+mas "flomo", id: 1665341561
+mas "Drafts", id: 1435957248
+mas "Kindle", id: 302584613
+mas "Vidhub", id: 1659622164
+mas "Windows App", id: 1295203466
+mas "WPS Office", id: 1443749478
+mas "钱迹", id: 1473785373
+mas "飞书", id: 1551632588
+mas "Follow", id: 6739802604
+mas "QQ音乐", id: 595615424
+# mas "Velja", id: 1607635845
+mas "百度网盘", id: 547166701
+mas "腾讯会议", id: 1484048379
+
+# cask "bluestacks"
+
+
+brew "stow" # dotfiles 设置
+brew "defaultbrowser" # set default browser
+
+brew "uv"
