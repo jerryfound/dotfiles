@@ -1,9 +1,18 @@
 # Brewfile generated from nix-darwin homebrew config
 
+# cli
+
+brew "zoxide"
+brew "ripgrep"
+brew "tmux"
+brew "fzf"
+
 # --- brews ---
 brew "djview4"
 brew "mas"
 brew "ollama"
+
+cask "taskpaper"   # 和 obsidian 一起用
 
 # --- casks ---
 cask "orbstack"
@@ -72,3 +81,5 @@ brew "stow" # dotfiles 设置
 brew "defaultbrowser" # set default browser
 
 brew "uv"
+
+cask "iina"
