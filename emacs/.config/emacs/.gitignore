@@ -1,0 +1,36 @@
+# 自动生成的配置
+custom.el
+
+# Emacs 临时文件
+*~
+\#*\#
+.\#*
+
+# 会话状态
+.session
+.desktop
+.desktop.lock
+
+# 最近文件列表
+recentf
+
+# 书签
+bookmarks
+
+# Transient 历史
+transient/
+
+# 原生编译缓存（如果在配置目录）
+eln-cache/
+
+# 项目文件
+projects
+.cache/
+
+# LSP/Eglot
+.lsp-session-*
+
+# 其他临时文件
+*.elc
+auto-save-list/
+network-security.data
