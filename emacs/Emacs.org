@@ -120,7 +120,18 @@ custom.el 存储的是:
 ** 包安装
 
 #+begin_src emacs-lisp
-(use-package org :ensure t)
+  (use-package org
+     :ensure t
+     :custom
+     (org-confirm-babel-evaluate nil)
+     (org-src-fontify-natively t)
+     (org-src-tab-acts-natively t)
+     (org-edit-src-content-indentation 0)
+
+     :config
+     (defun org-custom/org-src-indentation ()
+       (when (eq major-mode 'emacs-lisp-mode)
+         (setq-local org-edit-src-content-indentation 2))))
 #+end_src
 
 ** 设置 Org 根目录

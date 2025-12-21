@@ -38,7 +38,18 @@
 
 (set-face-attribute 'default nil :font "Maple Mono NF CN-15")
 
-(use-package org :ensure t)
+(use-package org
+   :ensure t
+   :custom
+   (org-confirm-babel-evaluate nil)
+   (org-src-fontify-natively t)
+   (org-src-tab-acts-natively t)
+   (org-edit-src-content-indentation 0)
+
+   :config
+   (defun org-custom/org-src-indentation ()
+     (when (eq major-mode 'emacs-lisp-mode)
+       (setq-local org-edit-src-content-indentation 2))))
 
 (setq org-directory "~/jerryfound.me/org.jerryfound.me/")
 
