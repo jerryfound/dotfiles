@@ -1,9 +1,9 @@
 #+TITLE: Emacs.org
-#+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
+#+PROPERTY: header-args:emacs-lisp :tangle ./.config/emacs/init.el :mkdirp yes
 
 * Early Init 配置
 :PROPERTIES:
-:header-args:emacs-lisp: :tangle ./early-init.el
+:header-args:emacs-lisp: :tangle ./.config/emacs/early-init.el
 :END:
 
 ** 定义 XDG 目录
@@ -43,8 +43,6 @@
 (scroll-bar-mode -1)      ; 禁用滚动条
 
 (setq visible-bell t)     ; 可视化 Bell
-
-
 #+end_src
 
 * 备份配置
@@ -86,30 +84,26 @@ custom.el 存储的是:
 * 软件包配置
 
 #+begin_src emacs-lisp
-(require 'package)
-(setq package-archives '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                         ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
-                         ("melpa"  . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
-(package-initialize)
+  ;; 使用 use-package 管理软件包
+  (require 'package)
+  (setq package-archives '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+                           ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
+                           ("melpa"  . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+  (package-initialize)
 
-(require 'use-package)
+  (require 'use-package)
 
-(setq use-package-always-ensure t)    ; 自动安装缺少的插件
+  (setq use-package-always-ensure t)    ; 自动安装缺少的插件
 #+end_src
 
 * 主题设置
 
 #+begin_src emacs-lisp
-  (use-package doom-themes
+  (use-package catppuccin-theme
     :ensure t
-    :custom
-    (doom-themes-enable-bold t)
-    (doom-themes-enable-italic t)
-
     :config
-    (load-theme 'doom-nord t)
-
-    (doom-themes-org-config))
+    (setq catppuccin-flavor 'mocha)
+    (load-theme 'catppuccin :no-confirm))
 #+end_src
 
 * 字体配置

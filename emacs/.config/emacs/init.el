@@ -16,6 +16,7 @@
 (set-fringe-mode 10)      ; 边缘留白
 (tooltip-mode -1)         ; 禁用提示框
 
+;; 使用 use-package 管理软件包
 (require 'package)
 (setq package-archives '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
                          ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
@@ -26,16 +27,11 @@
 
 (setq use-package-always-ensure t)    ; 自动安装缺少的插件
 
-(use-package doom-themes
+(use-package catppuccin-theme
   :ensure t
-  :custom
-  (doom-themes-enable-bold t)
-  (doom-themes-enable-italic t)
-
   :config
-  (load-theme 'doom-nord t)
-
-  (doom-themes-org-config))
+  (setq catppuccin-flavor 'mocha)
+  (load-theme 'catppuccin :no-confirm))
 
 (set-face-attribute 'default nil :font "Maple Mono NF CN-15")
 
