@@ -1,24 +1,3 @@
-;; 设置备份文件位置
-(let ((backup-dir (expand-file-name "emacs/backups" xdg-state-home)))
-  (setq backup-directory-alist (list (cons "." backup-dir)))
-  (make-directory backup-dir t))
-
-;; 保留最近5次备份
-(setq version-control t) ; 启用版本控制
-(setq kept-new-versions 5) ; 保留最近5个版本
-(setq kept-old-versions 0) ; 不保留旧版本
-(setq delete-old-versions t) ; 自动删除超出的版本
-
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(when (file-exists-p custom-file)
-  (load custom-file))
-
-(set-fringe-mode 10)      ; 边缘留白
-(tooltip-mode -1)         ; 禁用提示框
-
-;; 启动时最大化
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
-
 ;; 使用 use-package 管理软件包
 (require 'package)
 (setq package-archives '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
@@ -30,28 +9,102 @@
 
 (setq use-package-always-ensure t)    ; 自动安装缺少的插件
 
-(use-package catppuccin-theme
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+;; 设置备份文件位置
+(let ((backup-dir (expand-file-name "emacs/backups" xdg-state-home)))
+  (setq backup-directory-alist (list (cons "." backup-dir)))
+  (make-directory backup-dir t))
+
+;; 保留最近5次备份
+(setq version-control t) ; 启用版本控制
+(setq kept-new-versions 5) ; 保留最近5个版本
+(setq kept-old-versions 0) ; 不保留旧版本
+(setq delete-old-versions t) ; 自动删除超出的版本
+
+(setq bookmark-default-file (expand-file-name "emacs/bookmarks" xdg-data-home))
+
+(set-fringe-mode 10)      ; 边缘留白
+(tooltip-mode -1)         ; 禁用提示框
+
+;; 启动时最大化
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+(global-visual-line-mode 1)
+
+(use-package ef-themes
   :ensure t
   :config
-  (setq catppuccin-flavor 'mocha)
-  (load-theme 'catppuccin :no-confirm))
+  ;; 主题轮换函数
+  (defun ef-custom/cycle-themes ()
+    "在 4 个 ef 主题中轮换"
+    (interactive)
+    (pcase (car custom-enabled-themes)
+      ('ef-elea-light (load-theme 'ef-spring t))
+      ('ef-spring (load-theme 'ef-bio t))
+      ('ef-bio (load-theme 'ef-elea-dark t))
+      (_ (load-theme 'ef-elea-light t)))
+    (message "Switched to: %s" (car custom-enabled-themes)))
+  
+  ;; 快捷键
+  (global-set-key (kbd "C-c t") 'ef-custom/cycle-themes)
+  
+  ;; 启动时加载
+  (load-theme 'ef-elea-dark t))
 
 (set-face-attribute 'default nil :font "Maple Mono NF CN-15")
 
-(use-package org
-   :ensure t
-   :custom
-   (org-confirm-babel-evaluate nil)
-   (org-src-fontify-natively t)
-   (org-src-tab-acts-natively t)
-   (org-edit-src-content-indentation 0)
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode))
 
-   :config
-   (defun org-custom/org-src-indentation ()
-     (when (eq major-mode 'emacs-lisp-mode)
-       (setq-local org-edit-src-content-indentation 2))))
+(setq recentf-save-file (expand-file-name "emacs/recentf" xdg-state-home))
+(recentf-mode 1)
+(setq recentf-max-saved-items 50)
+
+(use-package consult
+  :ensure t
+  :bind (("C-x b" . consult-buffer)
+         ("C-x C-r" . consult-recent-file)))
+
+(use-package org :ensure t)
+
+(setq org-confirm-babel-evaluate nil)
+(setq org-src-fontify-natively t)
+(setq org-src-tab-acts-natively t)
+(setq org-edit-src-content-indentation 0)
+
+(org-babel-do-load-languages
+  'org-babel-load-languages
+  '((emacs-lisp . t)))
 
 (setq org-directory "~/jerryfound.me/org.jerryfound.me/")
+
+(with-eval-after-load 'org
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
+  (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp")))
+
+(defun org-custom/font ()
+  (setq buffer-face-mode-face '(:family "LXGW Bright Code" :height 180 :weight light))
+  (buffer-face-mode)
+  (setq-local line-spacing 0.25))
+
+(add-hook 'org-mode-hook 'org-custom/font)
+
+(custom-set-faces
+ '(org-level-1 ((t (:height 1.3 :weight bold))))
+ '(org-level-2 ((t (:height 1.2 :weight bold))))
+ '(org-level-3 ((t (:height 1.1 :weight bold))))
+ '(org-level-4 ((t (:height 1.0 :weight bold))))
+ '(org-level-5 ((t (:height 1.0))))
+ '(org-level-6 ((t (:height 1.0))))
+ '(org-level-7 ((t (:height 1.0))))
+ '(org-level-8 ((t (:height 1.0)))))
 
 (setq org-todo-keywords
       '((sequence "待办(t)" "|" "完成(d)" "迁移(m)" "排期(s)" "取消(c)")
@@ -67,9 +120,38 @@
       ("事件" . (:foreground "#89b4fa" :weight bold))   ; 柔和蓝
       ("笔记" . (:foreground "#cba6f7" :weight bold)))) ; 柔和紫
 
+;; 关闭全局的 log-done
+(setq org-log-done nil)
+
+;; 只为"完成"状态添加 CLOSED 时间戳
+(defun my/org-add-closed-on-done ()
+  "只有切换到'完成'状态时添加 CLOSED 时间戳，其他状态移除 CLOSED"
+  (if (string= org-state "完成")
+      (org-add-planning-info 'closed (org-current-effective-time))
+    (org-add-planning-info nil nil 'closed)))
+
+(add-hook 'org-after-todo-state-change-hook 'my/org-add-closed-on-done)
+
+;; 定义删除线应用函数
+(defun my/org-done-strike-through ()
+  "Add strike-through to DONE headlines"
+  (setq org-fontify-done-headline t)
+  (set-face-attribute 'org-headline-done nil
+                      :strike-through t
+                      :inherit 'org-done))
+
+;; 初始加载时应用
+(with-eval-after-load 'org
+  (my/org-done-strike-through))
+
+;; 主题切换后自动重新应用
+(advice-add 'load-theme :after
+            (lambda (&rest _)
+              (my/org-done-strike-through)))
+
 (setq org-default-notes-file (concat org-directory "/journal.org"))
  
-(setq org-capture-tempaltes
+(setq org-capture-templates
       '(("t" "任务" entry (file+datetree "")
 	 "* 待办 %(format-time-string \"%H:%M\") %?")
 	("e" "事件" entry (file+datetree "")
@@ -79,18 +161,8 @@
 
 (global-set-key (kbd "C-c c") 'org-capture)
 
-(use-package vertico
-  :ensure t
-  :init
-  (vertico-mode))
-
-(recentf-mode 1)
-(setq recentf-max-saved-items 50)
-(use-package consult
-  :ensure t
-  :bind (("C-x b" . consult-buffer)
-         ("C-x C-r" . consult-recent-file)))
-
-(org-babel-do-load-languages
-  'org-babel-load-languages
-  '((emacs-lisp . t)))
+(global-set-key (kbd "C-c r") (lambda ()
+				(interactive)
+				(load-file "~/.config/emacs/init.el")
+				(revert-buffer t t t)
+				(message "init.el reload.")))

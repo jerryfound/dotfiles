@@ -1,12 +1,21 @@
-#+TITLE: Emacs.org
+#+TITLE: Emacs Configuration
 #+PROPERTY: header-args:emacs-lisp :tangle ./.config/emacs/init.el :mkdirp yes
+
+* 配置说明
+
+这是一个基于 Org Mode 的 Emacs 配置，使用 Literate Programming 方式管理。主要功能：
+- Org Mode 作为核心的笔记和任务管理系统
+- 简洁高效的界面配置
+- 模块化的包管理
+
+保存此文件时会自动生成 =early-init.el= 和 =init.el= 配置文件。
 
 * Early Init 配置
 :PROPERTIES:
 :header-args:emacs-lisp: :tangle ./.config/emacs/early-init.el
 :END:
 
-** 定义 XDG 目录
+** XDG 目录规范
 
 #+begin_src emacs-lisp
   ;; 定义 XDG 目录变量
@@ -16,8 +25,7 @@
         			   (expand-file-name "~/.local/state")))
 #+end_src
 
-
-** 设置 elpa 目录位置
+** 包系统目录设置
 
 #+begin_src emacs-lisp
   ;; 设置 elpa 目录位置
@@ -25,16 +33,14 @@
   (make-directory package-user-dir t)
 #+end_src
 
-** 设置 auto-save 目录位置
 #+begin_src emacs-lisp
   ;; 设置 auto-save 目录位置
   (setq auto-save-list-file-prefix
         (expand-file-name "emacs/auto-save-list/.saves-" xdg-state-home))
   (make-directory (file-name-directory auto-save-list-file-prefix) t)
-
 #+end_src
 
-** UI 设置
+** 启动性能优化
 
 #+begin_src emacs-lisp
 (setq inhibit-startup-message t)  ; 禁用启动画面
@@ -45,65 +51,9 @@
 (setq visible-bell t)     ; 可视化 Bell
 #+end_src
 
-* 书签配置
+* Init.el 配置
 
-#+begin_src emacs-lisp
-(setq bookmark-default-file (expand-file-name "emacs/bookmarks" xdg-data-home))
-#+end_src
-
-
-* 备份配置
-
-#+begin_src emacs-lisp
-  ;; 设置备份文件位置
-  (let ((backup-dir (expand-file-name "emacs/backups" xdg-state-home)))
-    (setq backup-directory-alist (list (cons "." backup-dir)))
-    (make-directory backup-dir t))
-
-  ;; 保留最近5次备份
-  (setq version-control t) ; 启用版本控制
-  (setq kept-new-versions 5) ; 保留最近5个版本
-  (setq kept-old-versions 0) ; 不保留旧版本
-  (setq delete-old-versions t) ; 自动删除超出的版本
-#+end_src
-
-* 配置重载
-
-#+begin_src emacs-lisp
-(global-set-key (kbd "C-c r") (lambda ()
-				(interactive)
-				(load-file "~/.config/emacs/init.el")
-				(revert-buffer t t t)
-				(message "init.el reload.")))
-#+end_src
-
-* Custom-file 配置
-
-custom.el 存储的是:
-
-- 通过 Customize 界面设置的选项值
-- 主题、字体等用户偏好
-- 标记为安全的 file-local variables
-
-#+begin_src emacs-lisp
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (when (file-exists-p custom-file)
-    (load custom-file))
-#+end_src
-
-* UI 设置
-
-#+begin_src emacs-lisp
-(set-fringe-mode 10)      ; 边缘留白
-(tooltip-mode -1)         ; 禁用提示框
-
-;; 启动时最大化
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
-
-(global-visual-line-mode 1)
-#+end_src
-
-* 软件包配置
+** 包管理系统
 
 #+begin_src emacs-lisp
   ;; 使用 use-package 管理软件包
@@ -118,7 +68,58 @@ custom.el 存储的是:
   (setq use-package-always-ensure t)    ; 自动安装缺少的插件
 #+end_src
 
-* 主题设置
+x** 系统基础配置
+
+*** Custom 文件隔离
+
+custom.el 存储的是:
+
+- 通过 Customize 界面设置的选项值
+- 主题、字体等用户偏好
+- 标记为安全的 file-local variables
+
+#+begin_src emacs-lisp
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (when (file-exists-p custom-file)
+    (load custom-file))
+#+end_src
+
+*** 备份系统
+
+#+begin_src emacs-lisp
+  ;; 设置备份文件位置
+  (let ((backup-dir (expand-file-name "emacs/backups" xdg-state-home)))
+    (setq backup-directory-alist (list (cons "." backup-dir)))
+    (make-directory backup-dir t))
+
+  ;; 保留最近5次备份
+  (setq version-control t) ; 启用版本控制
+  (setq kept-new-versions 5) ; 保留最近5个版本
+  (setq kept-old-versions 0) ; 不保留旧版本
+  (setq delete-old-versions t) ; 自动删除超出的版本
+#+end_src
+
+*** 书签系统
+
+#+begin_src emacs-lisp
+(setq bookmark-default-file (expand-file-name "emacs/bookmarks" xdg-data-home))
+#+end_src
+
+** 界面配置
+
+*** UI 基础设置
+
+#+begin_src emacs-lisp
+(set-fringe-mode 10)      ; 边缘留白
+(tooltip-mode -1)         ; 禁用提示框
+
+;; 启动时最大化
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+(global-visual-line-mode 1)
+#+end_src
+
+*** 主题系统
 
 #+begin_src emacs-lisp
 (use-package ef-themes
@@ -139,35 +140,87 @@ custom.el 存储的是:
   (global-set-key (kbd "C-c t") 'ef-custom/cycle-themes)
   
   ;; 启动时加载
-  (load-theme 'ef-elea-light t))
+  (load-theme 'ef-elea-dark t))
 #+end_src
 
-* 字体配置
+*** 字体配置
 
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil :font "Maple Mono NF CN-15")
 #+end_src
 
-* Org 配置
+** 编辑工具
 
-** 包安装, 基础配置
+*** Vertico 补全界面
 
 #+begin_src emacs-lisp
-  (use-package org
-     :ensure t
-     :custom
-     (org-confirm-babel-evaluate nil)
-     (org-src-fontify-natively t)
-     (org-src-tab-acts-natively t)
-     (org-edit-src-content-indentation 0)
-
-     :config
-     (defun org-custom/org-src-indentation ()
-       (when (eq major-mode 'emacs-lisp-mode)
-         (setq-local org-edit-src-content-indentation 2))))
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode))
 #+end_src
 
-** Org 字体配置
+*** Consult 搜索与导航
+
+Consult 提供了增强的搜索命令。这里同时配置 recentf 模式，为 =consult-recent-file= 提供数据支持。
+
+#+begin_src emacs-lisp
+(setq recentf-save-file (expand-file-name "emacs/recentf" xdg-state-home))
+(recentf-mode 1)
+(setq recentf-max-saved-items 50)
+
+(use-package consult
+  :ensure t
+  :bind (("C-x b" . consult-buffer)
+         ("C-x C-r" . consult-recent-file)))
+#+end_src
+
+** Org Mode
+
+*** 基础配置
+
+**** Org 包安装
+
+#+begin_src emacs-lisp
+(use-package org :ensure t)
+#+end_src
+
+**** 代码块编辑配置
+
+#+begin_src emacs-lisp
+(setq org-confirm-babel-evaluate nil)
+(setq org-src-fontify-natively t)
+(setq org-src-tab-acts-natively t)
+(setq org-edit-src-content-indentation 0)
+#+end_src
+
+**** Babel 语言支持
+
+#+begin_src emacs-lisp
+(org-babel-do-load-languages
+  'org-babel-load-languages
+  '((emacs-lisp . t)))
+#+end_src
+
+**** Org 根目录
+
+#+begin_src emacs-lisp
+(setq org-directory "~/jerryfound.me/org.jerryfound.me/")
+#+end_src
+
+**** Org-tempo 模板
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
+  (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp")))
+#+end_src
+
+*** 视觉样式
+
+**** Org 专用字体
 
 #+begin_src emacs-lisp
 (defun org-custom/font ()
@@ -178,13 +231,7 @@ custom.el 存储的是:
 (add-hook 'org-mode-hook 'org-custom/font)
 #+end_src
 
-** 设置 Org 根目录
-
-#+begin_src emacs-lisp
-(setq org-directory "~/jerryfound.me/org.jerryfound.me/")
-#+end_src
-
-** headline 配置
+**** 标题层级样式
 
 #+begin_src emacs-lisp
 (custom-set-faces
@@ -198,17 +245,9 @@ custom.el 存储的是:
  '(org-level-8 ((t (:height 1.0)))))
 #+end_src
 
-** Org-tempo 配置
+*** 任务管理
 
-#+begin_src emacs-lisp
-(with-eval-after-load 'org
-  (require 'org-tempo)
-
-  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
-  (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp")))
-#+end_src
-
-** TODO 设置
+**** TODO 状态定义
 
 在子弹笔记中, 一个笔记有三种类型: 任务, 事件和笔记.
 
@@ -228,16 +267,54 @@ custom.el 存储的是:
       ("取消" . (:foreground "#6c7086" :weight bold))   ; 灰色
       ("事件" . (:foreground "#89b4fa" :weight bold))   ; 柔和蓝
       ("笔记" . (:foreground "#cba6f7" :weight bold)))) ; 柔和紫
-
-;; 添加任务完成状态后的删除线,有些主题的完成状态视觉效果不明显
-(setq org-fontify-done-headline t)
-(with-eval-after-load 'org
-  (set-face-attribute 'org-headline-done nil
-		      :strike-through t
-		      :inherit 'org-done))
 #+end_src
 
-** Capture 设置
+**** 完成状态时间戳
+
+在子弹笔记工作流中，只有"完成"状态表示任务真正结束，需要记录完成时间。而"迁移"、"排期"、"取消"虽然在 agenda 中不再显示（位于 | 后），但不算真正完成，不需要时间戳。
+
+Org Mode 的 =org-log-done= 会为所有 | 后的状态添加 CLOSED，无法区分。因此这里通过钩子函数实现：只有切换到"完成"时添加 CLOSED 时间戳，切换到其他状态时移除。
+
+#+begin_src emacs-lisp
+;; 关闭全局的 log-done
+(setq org-log-done nil)
+
+;; 只为"完成"状态添加 CLOSED 时间戳
+(defun my/org-add-closed-on-done ()
+  "只有切换到'完成'状态时添加 CLOSED 时间戳，其他状态移除 CLOSED"
+  (if (string= org-state "完成")
+      (org-add-planning-info 'closed (org-current-effective-time))
+    (org-add-planning-info nil nil 'closed)))
+
+(add-hook 'org-after-todo-state-change-hook 'my/org-add-closed-on-done)
+#+end_src
+
+**** 完成状态增强
+
+添加任务完成状态后的删除线,有些主题的完成状态视觉效果不明显。这个配置确保切换主题后删除线效果仍然保留。
+
+#+begin_src emacs-lisp
+;; 定义删除线应用函数
+(defun my/org-done-strike-through ()
+  "Add strike-through to DONE headlines"
+  (setq org-fontify-done-headline t)
+  (set-face-attribute 'org-headline-done nil
+                      :strike-through t
+                      :inherit 'org-done))
+
+;; 初始加载时应用
+(with-eval-after-load 'org
+  (my/org-done-strike-through))
+
+;; 主题切换后自动重新应用
+(advice-add 'load-theme :after
+            (lambda (&rest _)
+              (my/org-done-strike-through)))
+#+end_src
+
+*** 快速捕获
+
+**** Capture 模板配置
 
 格式如下: ~* 待办 具体的待办事项~
 
@@ -255,37 +332,19 @@ custom.el 存储的是:
   (global-set-key (kbd "C-c c") 'org-capture)
 #+end_src
 
-* 补全增强
+** 工具函数
 
-vertico + consult
-
-#+begin_src emacs-lisp
-(use-package vertico
-  :ensure t
-  :init
-  (vertico-mode))
-
-(setq recentf-save-file (expand-file-name "emacs/recentf" xdg-state-home))
-(recentf-mode 1)
-(setq recentf-max-saved-items 50)
-(use-package consult
-  :ensure t
-  :bind (("C-x b" . consult-buffer)
-         ("C-x C-r" . consult-recent-file)))
-#+end_src
-
-
-* 配置 Babel
+*** 配置重载
 
 #+begin_src emacs-lisp
-(org-babel-do-load-languages
-  'org-babel-load-languages
-  '((emacs-lisp . t)))
+(global-set-key (kbd "C-c r") (lambda ()
+				(interactive)
+				(load-file "~/.config/emacs/init.el")
+				(revert-buffer t t t)
+				(message "init.el reload.")))
 #+end_src
 
-#+RESULTS:
-  
-* 配置自动生成
+* 文档生成说明
 :PROPERTIES:
 :tangle: no
 :END:
