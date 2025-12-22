@@ -182,22 +182,14 @@
 
 (add-hook 'org-journal-mode-hook
           (lambda ()
-            (face-remap-set-base 'org-level-1 
-                                 :height 1.1 :weight 'bold)
-            (face-remap-set-base 'org-level-2 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-3 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-4 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-5 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-6 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-7 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-8 
-                                 :height 1.0 :weight 'normal)))
+            (face-remap-set-base 'org-level-1 :inherit 'org-level-1 :height 0.85 :weight 'bold)
+            (face-remap-set-base 'org-level-2 :inherit 'org-level-2 :height 0.83 :weight 'normal)
+            (face-remap-set-base 'org-level-3 :inherit 'org-level-3 :height 0.91 :weight 'normal)
+            (face-remap-set-base 'org-level-4 :inherit 'org-level-4 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-5 :inherit 'org-level-5 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-6 :inherit 'org-level-6 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-7 :inherit 'org-level-7 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-8 :inherit 'org-level-8 :height 1.0 :weight 'normal)))
 
 ;; 辅助函数, 定位到当天的 journal entry 末尾
 (defun org-journal-find-location ()

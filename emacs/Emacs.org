@@ -369,27 +369,21 @@ Org Mode 的 =org-log-done= 会为所有 | 后的状态添加 CLOSED，无法区
 
 **** 配置 headline 大小
 
-在 org-mode 中, 默认的 heading 1~4 的比例分别是 1.3~1.0. 但在 org-journal 中, 由于 entry 是 heading 2 层级, 所以就会显得字体过大, 需要在这个模式中调整
+在 org-mode 中, 默认的 heading 1~4 的比例分别是 1.3~1.0. 但在 org-journal 中, 由于 entry 是 heading 2 层级, 所以就会显得字体过大, 需要在这个模式中调整.
+
+由于全局设置中, 各个 heading 的比例是 1.3, 1.2, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 然后使用 :inherit 继承之后, :height 的计算是基于全局设置的值的比例, 所以这里为了保证第一个 heading 是 1.1, 其他都是 1.0, 就设置了这么一套值.
 
 #+begin_src emacs-lisp
 (add-hook 'org-journal-mode-hook
           (lambda ()
-            (face-remap-set-base 'org-level-1 
-                                 :height 1.1 :weight 'bold)
-            (face-remap-set-base 'org-level-2 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-3 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-4 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-5 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-6 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-7 
-                                 :height 1.0 :weight 'normal)
-            (face-remap-set-base 'org-level-8 
-                                 :height 1.0 :weight 'normal)))
+            (face-remap-set-base 'org-level-1 :inherit 'org-level-1 :height 0.85 :weight 'bold)
+            (face-remap-set-base 'org-level-2 :inherit 'org-level-2 :height 0.83 :weight 'normal)
+            (face-remap-set-base 'org-level-3 :inherit 'org-level-3 :height 0.91 :weight 'normal)
+            (face-remap-set-base 'org-level-4 :inherit 'org-level-4 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-5 :inherit 'org-level-5 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-6 :inherit 'org-level-6 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-7 :inherit 'org-level-7 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-8 :inherit 'org-level-8 :height 1.0 :weight 'normal)))
 #+end_src
 
 **** 配置 New Entry 处理
