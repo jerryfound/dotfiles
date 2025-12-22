@@ -408,7 +408,7 @@ Org Mode 的 =org-log-done= 会为所有 | 后的状态添加 CLOSED，无法区
 (defun org-journal-custom/insert-entry (type)
   "在今天的 journal 插入指定类型的 entry"
   (org-journal-find-location)
-  (insert "\n** " type " ")
+  (insert "** " type " ")
   (insert (format-time-string "%H:%M "))
   (widen))
 

@@ -210,7 +210,7 @@
 (defun org-journal-custom/insert-entry (type)
   "在今天的 journal 插入指定类型的 entry"
   (org-journal-find-location)
-  (insert "\n** " type " ")
+  (insert "** " type " ")
   (insert (format-time-string "%H:%M "))
   (widen))
 
