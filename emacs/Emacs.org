@@ -45,6 +45,13 @@
 (setq visible-bell t)     ; 可视化 Bell
 #+end_src
 
+* 书签配置
+
+#+begin_src emacs-lisp
+(setq bookmark-default-file (expand-file-name "emacs/bookmarks" xdg-data-home))
+#+end_src
+
+
 * 备份配置
 
 #+begin_src emacs-lisp
@@ -58,6 +65,16 @@
   (setq kept-new-versions 5) ; 保留最近5个版本
   (setq kept-old-versions 0) ; 不保留旧版本
   (setq delete-old-versions t) ; 自动删除超出的版本
+#+end_src
+
+* 配置重载
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c r") (lambda ()
+				(interactive)
+				(load-file "~/.config/emacs/init.el")
+				(revert-buffer t t t)
+				(message "init.el reload.")))
 #+end_src
 
 * Custom-file 配置
@@ -77,11 +94,13 @@ custom.el 存储的是:
 * UI 设置
 
 #+begin_src emacs-lisp
-  (set-fringe-mode 10)      ; 边缘留白
-  (tooltip-mode -1)         ; 禁用提示框
+(set-fringe-mode 10)      ; 边缘留白
+(tooltip-mode -1)         ; 禁用提示框
 
-  ;; 启动时最大化
-  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+;; 启动时最大化
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+(global-visual-line-mode 1)
 #+end_src
 
 * 软件包配置
@@ -102,11 +121,25 @@ custom.el 存储的是:
 * 主题设置
 
 #+begin_src emacs-lisp
-  (use-package catppuccin-theme
-    :ensure t
-    :config
-    (setq catppuccin-flavor 'mocha)
-    (load-theme 'catppuccin :no-confirm))
+(use-package ef-themes
+  :ensure t
+  :config
+  ;; 主题轮换函数
+  (defun ef-custom/cycle-themes ()
+    "在 4 个 ef 主题中轮换"
+    (interactive)
+    (pcase (car custom-enabled-themes)
+      ('ef-elea-light (load-theme 'ef-spring t))
+      ('ef-spring (load-theme 'ef-bio t))
+      ('ef-bio (load-theme 'ef-elea-dark t))
+      (_ (load-theme 'ef-elea-light t)))
+    (message "Switched to: %s" (car custom-enabled-themes)))
+  
+  ;; 快捷键
+  (global-set-key (kbd "C-c t") 'ef-custom/cycle-themes)
+  
+  ;; 启动时加载
+  (load-theme 'ef-elea-light t))
 #+end_src
 
 * 字体配置
@@ -117,7 +150,7 @@ custom.el 存储的是:
 
 * Org 配置
 
-** 包安装
+** 包安装, 基础配置
 
 #+begin_src emacs-lisp
   (use-package org
@@ -134,10 +167,45 @@ custom.el 存储的是:
          (setq-local org-edit-src-content-indentation 2))))
 #+end_src
 
+** Org 字体配置
+
+#+begin_src emacs-lisp
+(defun org-custom/font ()
+  (setq buffer-face-mode-face '(:family "LXGW Bright Code" :height 180 :weight light))
+  (buffer-face-mode)
+  (setq-local line-spacing 0.25))
+
+(add-hook 'org-mode-hook 'org-custom/font)
+#+end_src
+
 ** 设置 Org 根目录
 
 #+begin_src emacs-lisp
 (setq org-directory "~/jerryfound.me/org.jerryfound.me/")
+#+end_src
+
+** headline 配置
+
+#+begin_src emacs-lisp
+(custom-set-faces
+ '(org-level-1 ((t (:height 1.3 :weight bold))))
+ '(org-level-2 ((t (:height 1.2 :weight bold))))
+ '(org-level-3 ((t (:height 1.1 :weight bold))))
+ '(org-level-4 ((t (:height 1.0 :weight bold))))
+ '(org-level-5 ((t (:height 1.0))))
+ '(org-level-6 ((t (:height 1.0))))
+ '(org-level-7 ((t (:height 1.0))))
+ '(org-level-8 ((t (:height 1.0)))))
+#+end_src
+
+** Org-tempo 配置
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("sp" . "src python"))
+  (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp")))
 #+end_src
 
 ** TODO 设置
@@ -147,19 +215,26 @@ custom.el 存储的是:
 对于任务, 初始状态是待办, 然后当天根据任务情况会跳转到其中一种状态: 完成, 迁移, 排期, 取消.
 
 #+begin_src emacs-lisp
-  (setq org-todo-keywords
-        '((sequence "待办(t)" "|" "完成(d)" "迁移(m)" "排期(s)" "取消(c)")
-  	(type "事件(e)" "|")
-  	(type "笔记(n)" "|")))
+(setq org-todo-keywords
+      '((sequence "待办(t)" "|" "完成(d)" "迁移(m)" "排期(s)" "取消(c)")
+	(type "事件(e)" "|")
+	(type "笔记(n)" "|")))
 
-  (setq org-todo-keyword-faces
-      '(("待办" . (:foreground "#f38ba8" :weight bold))   ; 柔和红
-        ("完成" . (:foreground "#a6e3a1" :weight bold))   ; 柔和绿
-        ("迁移" . (:foreground "#fab387" :weight bold))   ; 柔和橙
-        ("排期" . (:foreground "#f9e2af" :weight bold))   ; 柔和黄
-        ("取消" . (:foreground "#6c7086" :weight bold))   ; 灰色
-        ("事件" . (:foreground "#89b4fa" :weight bold))   ; 柔和蓝
-        ("笔记" . (:foreground "#cba6f7" :weight bold)))) ; 柔和紫
+(setq org-todo-keyword-faces
+    '(("待办" . (:foreground "#f38ba8" :weight bold))   ; 柔和红
+      ("完成" . (:foreground "#a6e3a1" :weight bold))   ; 柔和绿
+      ("迁移" . (:foreground "#fab387" :weight bold))   ; 柔和橙
+      ("排期" . (:foreground "#f9e2af" :weight bold))   ; 柔和黄
+      ("取消" . (:foreground "#6c7086" :weight bold))   ; 灰色
+      ("事件" . (:foreground "#89b4fa" :weight bold))   ; 柔和蓝
+      ("笔记" . (:foreground "#cba6f7" :weight bold)))) ; 柔和紫
+
+;; 添加任务完成状态后的删除线,有些主题的完成状态视觉效果不明显
+(setq org-fontify-done-headline t)
+(with-eval-after-load 'org
+  (set-face-attribute 'org-headline-done nil
+		      :strike-through t
+		      :inherit 'org-done))
 #+end_src
 
 ** Capture 设置
@@ -169,7 +244,7 @@ custom.el 存储的是:
 #+begin_src emacs-lisp
   (setq org-default-notes-file (concat org-directory "/journal.org"))
    
-  (setq org-capture-tempaltes
+  (setq org-capture-templates
         '(("t" "任务" entry (file+datetree "")
   	 "* 待办 %(format-time-string \"%H:%M\") %?")
   	("e" "事件" entry (file+datetree "")
@@ -185,17 +260,18 @@ custom.el 存储的是:
 vertico + consult
 
 #+begin_src emacs-lisp
-  (use-package vertico
-    :ensure t
-    :init
-    (vertico-mode))
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode))
 
-  (recentf-mode 1)
-  (setq recentf-max-saved-items 50)
-  (use-package consult
-    :ensure t
-    :bind (("C-x b" . consult-buffer)
-           ("C-x C-r" . consult-recent-file)))
+(setq recentf-save-file (expand-file-name "emacs/recentf" xdg-state-home))
+(recentf-mode 1)
+(setq recentf-max-saved-items 50)
+(use-package consult
+  :ensure t
+  :bind (("C-x b" . consult-buffer)
+         ("C-x C-r" . consult-recent-file)))
 #+end_src
 
 
