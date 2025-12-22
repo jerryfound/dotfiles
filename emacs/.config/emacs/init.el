@@ -173,15 +173,79 @@
             (lambda (&rest _)
               (my/org-done-strike-through)))
 
-(setq org-default-notes-file (concat org-directory "/journal.org"))
- 
+(use-package org-journal :ensure t)
+
+(setq org-journal-dir "~/jerryfound.me/notes.jerryfound.me/journal/")
+(setq org-journal-file-type 'yearly)
+(setq org-journal-file-format "%Y-journal.org")
+(setq org-journal-date-format "%Y-%m-%d %A")
+
+(add-hook 'org-journal-mode-hook
+          (lambda ()
+            (face-remap-set-base 'org-level-1 
+                                 :height 1.1 :weight 'bold)
+            (face-remap-set-base 'org-level-2 
+                                 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-3 
+                                 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-4 
+                                 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-5 
+                                 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-6 
+                                 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-7 
+                                 :height 1.0 :weight 'normal)
+            (face-remap-set-base 'org-level-8 
+                                 :height 1.0 :weight 'normal)))
+
+;; 辅助函数, 定位到当天的 journal entry 末尾
+(defun org-journal-find-location ()
+  (org-journal-new-entry t)
+  (unless (eq org-journal-file-type 'daily)
+    (org-narrow-to-subtree))
+  (goto-char (point-max)))
+
+;; 辅助函数, 在 journal 文件内直接插入
+(defun org-journal-custom/insert-entry (type)
+  "在今天的 journal 插入指定类型的 entry"
+  (org-journal-find-location)
+  (insert "\n** " type " ")
+  (insert (format-time-string "%H:%M "))
+  (widen))
+
+;; 选择函数, 选择相应类型, 插入 template
+(defun org-journal-custom/new-entry-with-type ()
+  "选择类型并插入 entry"
+  (interactive)
+  (let ((type (read-char-choice 
+               "条目类型: [t]待办, [e]事件, [n]笔记: " 
+               '(?t ?e ?n))))
+    (org-journal-custom/insert-entry 
+     (cond
+      ((eq type ?t) "待办")
+      ((eq type ?e) "事件")
+      ((eq type ?n) "笔记")))))
+
+;; 重新绑定 C-c C-j（在 org-journal-mode 里）
+(with-eval-after-load 'org-journal
+  (define-key org-journal-mode-map (kbd "C-c C-j") 
+    'org-journal-custom/new-entry-with-type))
+
 (setq org-capture-templates
-      '(("t" "任务" entry (file+datetree "")
-	 "* 待办 %(format-time-string \"%H:%M\") %?")
-	("e" "事件" entry (file+datetree "")
-	 "* 事件 %(format-time-string \"%H:%M\") %?")
-	("n" "笔记" entry (file+datetree "")
-	 "* 笔记 %(format-time-string \"%H:%M\") %?")))
+      '(("j" "日记")
+        ("jt" "待办" plain
+         (function org-journal-find-location)
+         "** 待办 %<%H:%M> %?"
+         :empty-lines 1)
+        ("je" "事件" plain
+         (function org-journal-find-location)
+         "** 事件 %<%H:%M> %?"
+         :empty-lines 1)
+        ("jn" "笔记" plain
+         (function org-journal-find-location)
+         "** 笔记 %<%H:%M> %?"
+         :empty-lines 1)))
 
 (global-set-key (kbd "C-c c") 'org-capture)
 
