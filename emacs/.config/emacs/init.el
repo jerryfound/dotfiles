@@ -89,6 +89,30 @@
   (add-to-list 'org-structure-template-alist '("sp" . "src python"))
   (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp")))
 
+(defun my/org-toggle-display-mode ()
+  "切换 org-mode 的编辑模式和阅读模式"
+  (interactive)
+  (if org-hide-emphasis-markers
+      ;; 切换到编辑模式
+      (progn
+        (setq-local org-hide-emphasis-markers nil)
+        (setq-local org-link-descriptive nil)
+        (setq-local org-pretty-entities nil)
+        (org-indent-mode -1)
+        (message "编辑模式"))
+    ;; 切换到阅读模式
+    (progn
+      (setq-local org-hide-emphasis-markers t)
+      (setq-local org-link-descriptive t)
+      (setq-local org-pretty-entities t)
+      (org-indent-mode 1)
+      (message "阅读模式")))
+  (font-lock-flush)
+  (font-lock-ensure))
+
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c p") 'my/org-toggle-display-mode))
+
 (defun org-custom/font ()
   (setq buffer-face-mode-face '(:family "LXGW Bright Code" :height 180 :weight light))
   (buffer-face-mode)

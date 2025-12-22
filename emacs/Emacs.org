@@ -218,6 +218,40 @@ Consult 提供了增强的搜索命令。这里同时配置 recentf 模式，为
   (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp")))
 #+end_src
 
+*** 编辑模式和阅读模式
+
+org mode 本身是可见即可得模式, 比如说: 在文字两边加上 =**= 这个符号之后, 这个文字变成就变成了粗体, 并且两边都有星号.
+
+但 org mode 的链接在写完 url 和 description 之后, 只会显示 description, 这样修改就比较麻烦了. 并且, org mode 本身的可见即可得模式在阅读情境下不够清爽.
+
+所以我的打算是设置两种模式, 一种是编辑模式, 另一种是阅读模式. 阅读模式会隐藏所有的标记, 但仍要注意, 它不是一个 read-only 模式, 依然是可以编辑的.
+
+#+begin_src emacs-lisp
+(defun my/org-toggle-display-mode ()
+  "切换 org-mode 的编辑模式和阅读模式"
+  (interactive)
+  (if org-hide-emphasis-markers
+      ;; 切换到编辑模式
+      (progn
+        (setq-local org-hide-emphasis-markers nil)
+        (setq-local org-link-descriptive nil)
+        (setq-local org-pretty-entities nil)
+        (org-indent-mode -1)
+        (message "编辑模式"))
+    ;; 切换到阅读模式
+    (progn
+      (setq-local org-hide-emphasis-markers t)
+      (setq-local org-link-descriptive t)
+      (setq-local org-pretty-entities t)
+      (org-indent-mode 1)
+      (message "阅读模式")))
+  (font-lock-flush)
+  (font-lock-ensure))
+
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c p") 'my/org-toggle-display-mode))
+#+end_src
+
 *** 视觉样式
 
 **** Org 专用字体
