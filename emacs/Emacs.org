@@ -18,11 +18,13 @@
 ** XDG 目录规范
 
 #+begin_src emacs-lisp
-  ;; 定义 XDG 目录变量
-  (defvar xdg-data-home (or (getenv "XDG_DATA_HOME")
-        			  (expand-file-name "~/.local/share")))
-  (defvar xdg-state-home (or (getenv "XDG_STATE_HOME")
-        			   (expand-file-name "~/.local/state")))
+;; 定义 XDG 目录变量
+(defvar xdg-data-home (or (getenv "XDG_DATA_HOME")
+      			  (expand-file-name "~/.local/share")))
+(defvar xdg-state-home (or (getenv "XDG_STATE_HOME")
+      			   (expand-file-name "~/.local/state")))
+(defvar xdg-cache-home (or (getenv "XDG_CACHE_HOME")
+			   (expand-file-name "~/.cache")))
 #+end_src
 
 ** 包系统目录设置
@@ -425,11 +427,9 @@ Org Mode 的 =org-log-done= 会为所有 | 后的状态添加 CLOSED，无法区
     'org-journal-custom/new-entry-with-type))
 #+end_src
 
-*** 快速捕获
+**** 针对 Org-Journal 的快速捕获
 
 快速捕获使用 Org capture, 用来在别的 buffer 中将需要记录的内容写入到 org-journal 当天的日志文件中.
-
-**** Capture 模板配置
 
 格式如下: ~** 待办 具体的待办事项~
 
@@ -450,6 +450,52 @@ Org Mode 的 =org-log-done= 会为所有 | 后的状态添加 CLOSED，无法区
          :empty-lines 1)))
 
 (global-set-key (kbd "C-c c") 'org-capture)
+#+end_src
+
+*** Org-roam 配置
+
+**** 安装 Org-roam
+
+#+begin_src emacs-lisp
+(use-package org-roam
+  :ensure t)
+#+end_src
+
+**** 基本设置
+
+#+begin_src emacs-lisp
+(setq org-roam-directory "~/jerryfound.me/notes.jerryfound.me")
+
+;; 设置 org-roam.db 文件位置, 并确保目录存在
+(setq org-roam-db-location 
+      (expand-file-name "emacs/org-roam.db" xdg-state-home))
+(make-directory (file-name-directory org-roam-db-location) t)
+
+;; 设置 org-id-locations 文件位置, 并确保目录存在
+(setq org-id-locations-file 
+      (expand-file-name "emacs/org-id-locations" xdg-cache-home))
+(make-directory (file-name-directory org-id-locations-file) t)
+
+;; db 自动同步
+(org-roam-db-autosync-mode)
+#+end_src
+
+**** 快捷键设置
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c n f") 'org-roam-node-find)
+(global-set-key (kbd "C-c n i") 'org-roam-node-insert)
+(global-set-key (kbd "C-c n l") 'org-roam-buffer-toggle)
+(global-set-key (kbd "C-c n p") 'org-id-get-create)
+#+end_src
+
+*** App Url-Scheme 识别
+
+#+begin_src emacs-lisp
+;; Devonthink
+(org-link-set-parameters "x-devonthink-item"
+  :follow (lambda (path)
+            (shell-command (concat "open 'x-devonthink-item:" path "'"))))
 #+end_src
 
 ** 工具函数

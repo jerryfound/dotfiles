@@ -241,6 +241,34 @@
 
 (global-set-key (kbd "C-c c") 'org-capture)
 
+(use-package org-roam
+  :ensure t)
+
+(setq org-roam-directory "~/jerryfound.me/notes.jerryfound.me")
+
+;; 设置 org-roam.db 文件位置, 并确保目录存在
+(setq org-roam-db-location 
+      (expand-file-name "emacs/org-roam.db" xdg-state-home))
+(make-directory (file-name-directory org-roam-db-location) t)
+
+;; 设置 org-id-locations 文件位置, 并确保目录存在
+(setq org-id-locations-file 
+      (expand-file-name "emacs/org-id-locations" xdg-cache-home))
+(make-directory (file-name-directory org-id-locations-file) t)
+
+;; db 自动同步
+(org-roam-db-autosync-mode)
+
+(global-set-key (kbd "C-c n f") 'org-roam-node-find)
+(global-set-key (kbd "C-c n i") 'org-roam-node-insert)
+(global-set-key (kbd "C-c n l") 'org-roam-buffer-toggle)
+(global-set-key (kbd "C-c n p") 'org-id-get-create)
+
+;; Devonthink
+(org-link-set-parameters "x-devonthink-item"
+  :follow (lambda (path)
+            (shell-command (concat "open 'x-devonthink-item:" path "'"))))
+
 (global-set-key (kbd "C-c r") (lambda ()
 				(interactive)
 				(load-file "~/.config/emacs/init.el")

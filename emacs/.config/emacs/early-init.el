@@ -3,6 +3,8 @@
       			  (expand-file-name "~/.local/share")))
 (defvar xdg-state-home (or (getenv "XDG_STATE_HOME")
       			   (expand-file-name "~/.local/state")))
+(defvar xdg-cache-home (or (getenv "XDG_CACHE_HOME")
+			   (expand-file-name "~/.cache")))
 
 ;; 设置 elpa 目录位置
 (setq package-user-dir (expand-file-name "emacs/elpa" xdg-data-home))
