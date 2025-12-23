@@ -98,7 +98,13 @@ command -v zoxide &>/dev/null && cd() {
 
 unset old_cmd new_cmd
 
-# starship
+# private config
+if [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/.zshrc.private" ]]; then
+    source "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/.zshrc.private"
+fi
+
+# starship, must be last one
 if command -v starship &> /dev/null; then
     eval "$(starship init zsh)"
 fi
+
