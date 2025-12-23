@@ -81,7 +81,7 @@
   'org-babel-load-languages
   '((emacs-lisp . t)))
 
-(setq org-directory "~/jerryfound.me/org.jerryfound.me/")
+(setq org-directory "~/jerryfound.me/notes.jerryfound.me/")
 
 (with-eval-after-load 'org
   (require 'org-tempo)
@@ -268,6 +268,14 @@
 (org-link-set-parameters "x-devonthink-item"
   :follow (lambda (path)
             (shell-command (concat "open 'x-devonthink-item:" path "'"))))
+
+(defun git/sync-to-github ()
+  "同步 org 到 GitHub"
+  (interactive)
+  (let ((default-directory org-directory))
+    (shell-command "git add . && git commit -m 'Auto sync' && git push")))
+
+(add-hook 'kill-emacs-hook #'git/sync-to-github)
 
 (global-set-key (kbd "C-c r") (lambda ()
 				(interactive)

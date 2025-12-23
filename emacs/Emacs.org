@@ -207,7 +207,7 @@ Consult 提供了增强的搜索命令。这里同时配置 recentf 模式，为
 **** Org 根目录
 
 #+begin_src emacs-lisp
-(setq org-directory "~/jerryfound.me/org.jerryfound.me/")
+(setq org-directory "~/jerryfound.me/notes.jerryfound.me/")
 #+end_src
 
 **** Org-tempo 模板
@@ -496,6 +496,18 @@ Org Mode 的 =org-log-done= 会为所有 | 后的状态添加 CLOSED，无法区
 (org-link-set-parameters "x-devonthink-item"
   :follow (lambda (path)
             (shell-command (concat "open 'x-devonthink-item:" path "'"))))
+#+end_src
+
+*** 自动上传到 github
+
+#+begin_src emacs-lisp
+(defun git/sync-to-github ()
+  "同步 org 到 GitHub"
+  (interactive)
+  (let ((default-directory org-directory))
+    (shell-command "git add . && git commit -m 'Auto sync' && git push")))
+
+(add-hook 'kill-emacs-hook #'git/sync-to-github)
 #+end_src
 
 ** 工具函数
