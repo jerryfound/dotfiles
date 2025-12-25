@@ -5,9 +5,18 @@
                          ("melpa"  . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
 (package-initialize)
 
-(require 'use-package)
+;; 刷新包列表（如果不存在的话）
+(unless package-archive-contents
+  (package-refresh-contents))
 
+;; 确保 use-package 已安装
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
 (setq use-package-always-ensure t)    ; 自动安装缺少的插件
+
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
@@ -25,6 +34,14 @@
 (setq delete-old-versions t) ; 自动删除超出的版本
 
 (setq bookmark-default-file (expand-file-name "emacs/bookmarks" xdg-data-home))
+
+;; savehist - 保存 minibuffer 历史
+(use-package savehist
+  :init
+  (let ((state-dir (expand-file-name "emacs/" xdg-state-home)))
+    (make-directory state-dir t)
+    (setq savehist-file (expand-file-name "history" state-dir)))
+  (savehist-mode))
 
 (set-fringe-mode 10)      ; 边缘留白
 (tooltip-mode -1)         ; 禁用提示框
@@ -54,12 +71,18 @@
   ;; 启动时加载
   (load-theme 'ef-elea-dark t))
 
+(use-package nerd-icons
+  :ensure t
+  :custom
+  (nerd-icons-font-family "Maple Mono NF CN"))
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
+
 (set-face-attribute 'default nil :font "Maple Mono NF CN-15")
 
-(use-package vertico
-  :ensure t
-  :init
-  (vertico-mode))
+(use-package vertico :ensure t :init (vertico-mode))
 
 (setq recentf-save-file (expand-file-name "emacs/recentf" xdg-state-home))
 (recentf-mode 1)
@@ -68,7 +91,20 @@
 (use-package consult
   :ensure t
   :bind (("C-x b" . consult-buffer)
+	 ("C-s" . consult-line)    
          ("C-x C-r" . consult-recent-file)))
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-pcm-leading-wildcard t))
+
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode))
 
 (use-package org :ensure t)
 

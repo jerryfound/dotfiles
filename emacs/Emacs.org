@@ -58,19 +58,34 @@
 ** 包管理系统
 
 #+begin_src emacs-lisp
-  ;; 使用 use-package 管理软件包
-  (require 'package)
-  (setq package-archives '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                           ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
-                           ("melpa"  . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
-  (package-initialize)
+;; 使用 use-package 管理软件包
+(require 'package)
+(setq package-archives '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+                         ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
+                         ("melpa"  . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+(package-initialize)
 
-  (require 'use-package)
+;; 刷新包列表（如果不存在的话）
+(unless package-archive-contents
+  (package-refresh-contents))
 
-  (setq use-package-always-ensure t)    ; 自动安装缺少的插件
+;; 确保 use-package 已安装
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)    ; 自动安装缺少的插件
 #+end_src
 
-x** 系统基础配置
+** 系统基础配置
+
+*** 设置 Esc 为退出
+
+还是 Vim 模式太好用了. ~Ctrl + g~ 稍微麻烦了点.
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+end_src
 
 *** Custom 文件隔离
 
@@ -105,6 +120,18 @@ custom.el 存储的是:
 
 #+begin_src emacs-lisp
 (setq bookmark-default-file (expand-file-name "emacs/bookmarks" xdg-data-home))
+#+end_src
+
+*** 历史文件配置
+
+#+begin_src emacs-lisp
+;; savehist - 保存 minibuffer 历史
+(use-package savehist
+  :init
+  (let ((state-dir (expand-file-name "emacs/" xdg-state-home)))
+    (make-directory state-dir t)
+    (setq savehist-file (expand-file-name "history" state-dir)))
+  (savehist-mode))
 #+end_src
 
 ** 界面配置
@@ -145,28 +172,38 @@ custom.el 存储的是:
   (load-theme 'ef-elea-dark t))
 #+end_src
 
+*** minibuffer 主题
+
+#+begin_src emacs-lisp
+(use-package nerd-icons
+  :ensure t
+  :custom
+  (nerd-icons-font-family "Maple Mono NF CN"))
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
+#+end_src
+
 *** 字体配置
 
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil :font "Maple Mono NF CN-15")
 #+end_src
 
-** 编辑工具
+*** minibuffer 增强
 
-*** Vertico 补全界面
+需要安装如下插件:
 
-#+begin_src emacs-lisp
-(use-package vertico
-  :ensure t
-  :init
-  (vertico-mode))
-#+end_src
-
-*** Consult 搜索与导航
-
-Consult 提供了增强的搜索命令。这里同时配置 recentf 模式，为 =consult-recent-file= 提供数据支持。
+- Vertico: 竖向补全
+- Consult: 命令增强
+- Orderless: 模糊搜索
+- Marginalia: 额外信息显示
+- Embark(可选): 文件处理
 
 #+begin_src emacs-lisp
+(use-package vertico :ensure t :init (vertico-mode))
+
 (setq recentf-save-file (expand-file-name "emacs/recentf" xdg-state-home))
 (recentf-mode 1)
 (setq recentf-max-saved-items 50)
@@ -174,7 +211,20 @@ Consult 提供了增强的搜索命令。这里同时配置 recentf 模式，为
 (use-package consult
   :ensure t
   :bind (("C-x b" . consult-buffer)
+	 ("C-s" . consult-line)    
          ("C-x C-r" . consult-recent-file)))
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-pcm-leading-wildcard t))
+
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode))
 #+end_src
 
 ** Org Mode
